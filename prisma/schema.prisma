@@ -1,0 +1,273 @@
+// Awka Youth Forum, Lagos Chapter — data model
+// Target: Postgres (Vercel Postgres / Neon / Supabase — any Postgres works)
+// ORM: Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------- Access control ----------
+
+enum AdminRole {
+  PRESIDENT
+  VICE_PRESIDENT
+  GENERAL_SECRETARY
+  ASST_GENERAL_SECRETARY
+  FINANCIAL_SECRETARY
+  TREASURER
+  PRO_1
+  PRO_2
+  DOS_1
+  DOS_2
+  PROVOST_1
+  PROVOST_2
+  SUPER_ADMIN // full access, outside the 12 elected offices — for the developer/IT lead
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String // argon2/bcrypt — never plaintext, never logged
+  role         AdminRole
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  auditLogs    AuditLog[]
+}
+
+// Every state-changing admin action, for accountability (BRD sec. 25 asks for
+// tiered admin access across 12 offices — an audit trail is what makes that real).
+model AuditLog {
+  id         String    @id @default(cuid())
+  admin      AdminUser @relation(fields: [adminId], references: [id])
+  adminId    String
+  action     String // e.g. "member.approve", "news.publish", "dues.confirm"
+  targetType String // e.g. "Member", "NewsPost"
+  targetId   String
+  detail     Json?
+  createdAt  DateTime  @default(now())
+
+  @@index([targetType, targetId])
+}
+
+// ---------- Membership ----------
+
+enum MembershipStatus {
+  PENDING // submitted, awaiting admin review (BRD sec. 11)
+  ACTIVE
+  INACTIVE // voluntarily ceased, or lapsed
+  REJECTED
+}
+
+model Village {
+  id      String   @id @default(cuid())
+  name    String   @unique // the "Village / Onuku" category
+  members Member[]
+}
+
+model Member {
+  id                   String            @id @default(cuid())
+  fullName             String
+  // Day + month only, no year — matches how AYF already collects this (privacy-friendly,
+  // and sidesteps storing full DOB for members who may be minors; see BRD sec. 10 & 11).
+  birthDay             Int
+  birthMonth           String
+  phone                String            @unique
+  email                String?
+  residentialLocation  String?
+  occupation           String?
+  areaOfInterest       String?
+  skills               String?
+  village              Village           @relation(fields: [villageId], references: [id])
+  villageId            String
+  status               MembershipStatus  @default(PENDING)
+  isMinor              Boolean           @default(false) // set explicitly if disclosed; gates sensitive fields
+  source               String            @default("web_registration") // "web_registration" | "legacy_spreadsheet_migration"
+  needsReview          Boolean           @default(false) // flagged during migration (e.g. shared phone number)
+  approvedAt           DateTime?
+  createdAt            DateTime          @default(now())
+  duesPayments         DuesPayment[]
+  attendanceRecords    AttendanceRecord[]
+  eventRegistrations   EventRegistration[]
+
+  @@index([status])
+}
+
+// ---------- Dues & attendance (Get Involved / Members' Area) ----------
+
+enum PaymentStatus {
+  PENDING_CONFIRMATION // member logged a transfer, treasurer hasn't confirmed
+  CONFIRMED
+  REJECTED
+}
+
+model DuesPayment {
+  id          String        @id @default(cuid())
+  member      Member        @relation(fields: [memberId], references: [id])
+  memberId    String
+  periodMonth Int // 1-12
+  periodYear  Int
+  amount      Decimal       @db.Decimal(10, 2)
+  reference   String? // bank transfer reference / note
+  status      PaymentStatus @default(PENDING_CONFIRMATION)
+  confirmedBy String? // AdminUser.id of treasurer who confirmed
+  confirmedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@unique([memberId, periodMonth, periodYear])
+}
+
+model Meeting {
+  id                String             @id @default(cuid())
+  title             String
+  date              DateTime
+  venue             String?
+  attendanceRecords AttendanceRecord[]
+}
+
+model AttendanceRecord {
+  id        String   @id @default(cuid())
+  meeting   Meeting  @relation(fields: [meetingId], references: [id])
+  meetingId String
+  member    Member   @relation(fields: [memberId], references: [id])
+  memberId  String
+  markedAt  DateTime @default(now())
+  markedBy  String? // AdminUser.id, or "self" if self check-in is allowed
+
+  @@unique([meetingId, memberId])
+}
+
+// ---------- Public-facing content ----------
+
+model Executive {
+  id           String   @id @default(cuid())
+  fullName     String
+  position     String // one of the 12 offices, kept as free text for easy reordering
+  photoUrl     String? // Vercel Blob / Supabase Storage URL
+  bio          String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+}
+
+model Event {
+  id                 String              @id @default(cuid())
+  name               String
+  date               DateTime
+  venue              String
+  address             String?
+  description        String?
+  flyerUrl           String?
+  isFeatured         Boolean             @default(false)
+  registrationOpen   Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  registrations      EventRegistration[]
+}
+
+model EventRegistration {
+  id        String   @id @default(cuid())
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  member    Member   @relation(fields: [memberId], references: [id])
+  memberId  String
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, memberId])
+}
+
+model NewsPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  body        String
+  category    String? // announcement | project_update | scholarship | achievement ...
+  publishedAt DateTime?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  title     String?
+  mediaUrl  String // Vercel Blob / Supabase Storage URL
+  mediaType String // "image" | "video"
+  category  String? // events | projects | meetings | outreach | leadership ...
+  eventDate DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  title       String
+  fileUrl     String
+  category    String? // constitution | annual_report | newsletter | policy ...
+  uploadedAt  DateTime @default(now())
+}
+
+// ---------- Enquiries (public forms) ----------
+
+model ContactEnquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+  handledBy String? // AdminUser.id
+  handledAt DateTime?
+}
+
+model PartnershipEnquiry {
+  id             String   @id @default(cuid())
+  organization   String
+  contactName    String
+  email          String
+  phone          String?
+  interestArea   String? // partnership | sponsorship | CSR
+  message        String
+  createdAt      DateTime @default(now())
+  handledBy      String?
+  handledAt      DateTime?
+}
+
+// Phone OTP for the members' area (sec. 12). Raw codes are never stored.
+model MemberOtp {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone])
+}
+
+// Singleton operational settings — contact, social, meeting. Not constitutional copy.
+model SiteConfig {
+  id           String   @id @default("ayf")
+  officialName String
+  rcNumber     String
+  motto        String
+  slogan       String
+  email        String
+  phone        String?
+  whatsapp     String?
+  address      String
+  facebookUrl  String?
+  instagramUrl String?
+  tiktokUrl    String?
+  xUrl         String?
+  linkedinUrl  String?
+  youtubeUrl   String?
+  meetingNote  String
+  meetingVenue String
+  updatedAt    DateTime @updatedAt
+}
