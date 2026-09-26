@@ -1,5 +1,5 @@
+import { Prisma, type SiteConfig } from "@prisma/client";
 import { prisma } from "./prisma";
-import type { SiteConfig } from "@prisma/client";
 
 export const SITE_CONFIG_DEFAULTS: Omit<SiteConfig, "updatedAt"> = {
   id: "ayf",
@@ -22,9 +22,17 @@ export const SITE_CONFIG_DEFAULTS: Omit<SiteConfig, "updatedAt"> = {
 };
 
 export async function getSiteConfig(): Promise<SiteConfig> {
-  return prisma.siteConfig.upsert({
-    where: { id: "ayf" },
-    update: {},
-    create: SITE_CONFIG_DEFAULTS,
-  });
+  const existing = await prisma.siteConfig.findUnique({ where: { id: "ayf" } });
+  if (existing) return existing;
+
+  try {
+    return await prisma.siteConfig.create({ data: SITE_CONFIG_DEFAULTS });
+  } catch (error) {
+    // Parallel prerenders (home + /_not-found) can both miss the row and create.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      const raced = await prisma.siteConfig.findUnique({ where: { id: "ayf" } });
+      if (raced) return raced;
+    }
+    throw error;
+  }
 }
