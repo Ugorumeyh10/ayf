@@ -14,7 +14,7 @@ export async function requestMemberCode(_prev: OtpState, formData: FormData): Pr
     ok: true,
     sent: true,
     message: process.env.VERCEL
-      ? "If this number is an active member, a sign-in code was sent by SMS (and email if we have one on file)."
+      ? "If this number is an active member, a sign-in code was issued. SMS/email is used when those keys are set; otherwise an officer can read the code in the office Members list."
       : "If this number is an active member, a sign-in code was issued. In local dev it is printed in the server log until SMS/email keys are set.",
   };
 }

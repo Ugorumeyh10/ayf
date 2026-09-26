@@ -2,6 +2,8 @@ import { prisma } from "../../lib/prisma";
 import PageHeader from "../../components/PageHeader";
 import RegisterForm from "./RegisterForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function JoinPage() {
   const villages = await prisma.village.findMany({ orderBy: { name: "asc" } });
 

@@ -246,6 +246,8 @@ model MemberOtp {
   expiresAt  DateTime
   consumedAt DateTime?
   createdAt  DateTime  @default(now())
+  /// Set only when SMS/email could not be sent, so an officer can read the code.
+  revealCode String?
 
   @@index([phone])
 }

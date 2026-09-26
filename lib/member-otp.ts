@@ -7,7 +7,10 @@ function normalizePhone(phone: string) {
   return phone.trim().replace(/\s+/g, "");
 }
 
-export async function issueMemberOtp(phone: string): Promise<{ ok: true } | { ok: false; message: string }> {
+export async function issueMemberOtp(
+  phone: string,
+  opts?: { revealToOfficer?: boolean },
+): Promise<{ ok: true } | { ok: false; message: string }> {
   const normalized = normalizePhone(phone);
   if (!/^0\d{10}$/.test(normalized)) {
     return { ok: false, message: "Enter an 11-digit Nigerian number starting with 0." };
@@ -31,11 +34,17 @@ export async function issueMemberOtp(phone: string): Promise<{ ok: true } | { ok
     data: { consumedAt: new Date() },
   });
 
-  await prisma.memberOtp.create({
-    data: { phone: normalized, codeHash, expiresAt },
-  });
+  const sent = await deliverMemberOtp({ phone: normalized, email: member.email, code });
 
-  await deliverMemberOtp({ phone: normalized, email: member.email, code });
+  await prisma.memberOtp.create({
+    data: {
+      phone: normalized,
+      codeHash,
+      expiresAt,
+      // Officers can read the code when SMS/email is not configured (Vercel + no Termii).
+      revealCode: sent.length === 0 || opts?.revealToOfficer ? code : null,
+    },
+  });
 
   return { ok: true };
 }
@@ -53,7 +62,7 @@ export async function consumeMemberOtp(phone: string, code: string) {
 
   await prisma.memberOtp.update({
     where: { id: otp.id },
-    data: { consumedAt: new Date() },
+    data: { consumedAt: new Date(), revealCode: null },
   });
 
   const member = await prisma.member.findUnique({ where: { phone: normalized } });

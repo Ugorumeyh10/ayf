@@ -3,6 +3,8 @@ import { prisma } from "../lib/prisma";
 import { getSiteConfig } from "../lib/site-config";
 import Reveal from "../components/Reveal";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [featuredEvent, upcomingEvent, memberCount, villageCount, site] = await Promise.all([
     prisma.event.findFirst({

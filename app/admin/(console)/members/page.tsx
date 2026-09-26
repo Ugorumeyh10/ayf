@@ -2,6 +2,7 @@ import { prisma } from "../../../../lib/prisma";
 import { requireCapability } from "../../../../lib/guards";
 import { hasCapability } from "../../../../lib/capabilities";
 import { approveMember, rejectMember } from "../../../actions/admin-members";
+import OfficeOtpForm from "./OfficeOtpForm";
 
 function initials(name: string) {
   return name
@@ -26,6 +27,14 @@ export default async function AdminMembersPage() {
     where: { needsReview: true },
     include: { village: true },
   });
+
+  const waitingCodes = canApprove
+    ? await prisma.memberOtp.findMany({
+        where: { revealCode: { not: null }, consumedAt: null, expiresAt: { gt: new Date() } },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      })
+    : [];
 
   return (
     <section className="block wrap">
@@ -67,6 +76,28 @@ export default async function AdminMembersPage() {
           </div>
         ))}
       </div>
+
+      {canApprove && (
+        <>
+          <div className="section-title">
+            <h2 style={{ fontSize: "1rem" }}>Member sign-in codes</h2>
+          </div>
+          <OfficeOtpForm />
+          {waitingCodes.length > 0 && (
+            <div className="member-list" style={{ marginBottom: 24 }}>
+              {waitingCodes.map((otp) => (
+                <div key={otp.id} className="member-row">
+                  <div className="who">
+                    <div className="name">{otp.phone}</div>
+                    <div className="meta">Expires {otp.expiresAt.toLocaleTimeString("en-GB")}</div>
+                  </div>
+                  <span className="badge">{otp.revealCode}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       <div className="section-title">
         <h2 style={{ fontSize: "1rem" }}>
