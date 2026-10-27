@@ -67,9 +67,11 @@ enum MembershipStatus {
 }
 
 model Village {
-  id      String   @id @default(cuid())
-  name    String   @unique // the "Village / Onuku" category
-  members Member[]
+  id        String   @id @default(cuid())
+  name      String   @unique // the "Village / Onuku" category
+  sortOrder Int      @default(0)
+  listed    Boolean  @default(true) // false = legacy name, hidden from join
+  members   Member[]
 }
 
 model Member {
@@ -254,22 +256,26 @@ model MemberOtp {
 
 // Singleton operational settings — contact, social, meeting. Not constitutional copy.
 model SiteConfig {
-  id           String   @id @default("ayf")
-  officialName String
-  rcNumber     String
-  motto        String
-  slogan       String
-  email        String
-  phone        String?
-  whatsapp     String?
-  address      String
-  facebookUrl  String?
-  instagramUrl String?
-  tiktokUrl    String?
-  xUrl         String?
-  linkedinUrl  String?
-  youtubeUrl   String?
-  meetingNote  String
-  meetingVenue String
-  updatedAt    DateTime @updatedAt
+  id             String   @id @default("ayf")
+  officialName   String
+  rcNumber       String
+  motto          String
+  slogan         String
+  email          String
+  phone          String?
+  whatsapp       String?
+  address        String
+  facebookUrl    String?
+  instagramUrl   String?
+  tiktokUrl      String?
+  xUrl           String?
+  linkedinUrl    String?
+  youtubeUrl     String?
+  meetingNote    String
+  meetingVenue   String
+  bankName       String?
+  accountName    String?
+  accountNumber  String?
+  heroImageUrl   String?
+  updatedAt      DateTime @updatedAt
 }

@@ -5,7 +5,11 @@ import RegisterForm from "./RegisterForm";
 export const dynamic = "force-dynamic";
 
 export default async function JoinPage() {
-  const villages = await prisma.village.findMany({ orderBy: { name: "asc" } });
+  const villages = await prisma.village.findMany({
+    where: { listed: true },
+    orderBy: { sortOrder: "asc" },
+    select: { id: true, name: true },
+  });
 
   return (
     <section className="block wrap">

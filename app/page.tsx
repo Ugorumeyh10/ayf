@@ -16,22 +16,23 @@ export default async function HomePage() {
       orderBy: { date: "asc" },
     }),
     prisma.member.count({ where: { status: "ACTIVE" } }),
-    prisma.village.count(),
+    prisma.village.count({ where: { listed: true } }),
     getSiteConfig(),
   ]);
 
   const event = featuredEvent ?? upcomingEvent;
+  const heroUrl = site.heroImageUrl;
+  const heroBackground = heroUrl
+    ? "linear-gradient(100deg, rgba(20,17,15,.52) 0%, rgba(20,17,15,.20) 40%, rgba(20,17,15,0) 65%), " +
+      "linear-gradient(to top, rgba(20,17,15,.55) 0%, rgba(20,17,15,0) 35%), " +
+      `url(${heroUrl})`
+    : "linear-gradient(160deg, #1a1612 0%, #14110f 55%, #2a100e 100%), url(/logo.jpg)";
 
   return (
     <>
       <div
-        className="hero"
-        style={{
-          backgroundImage:
-            "linear-gradient(100deg, rgba(20,17,15,.52) 0%, rgba(20,17,15,.20) 40%, rgba(20,17,15,0) 65%), " +
-            "linear-gradient(to top, rgba(20,17,15,.55) 0%, rgba(20,17,15,0) 35%), " +
-            "url(/hero-photo.jpg)",
-        }}
+        className={`hero${heroUrl ? "" : " hero-plain"}`}
+        style={{ backgroundImage: heroBackground }}
       >
         <div className="hero-inner wrap">
           <p className="eyebrow">Awka Youth Forum &middot; Lagos Chapter</p>

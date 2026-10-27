@@ -19,6 +19,10 @@ export const SITE_CONFIG_DEFAULTS: Omit<SiteConfig, "updatedAt"> = {
   youtubeUrl: null,
   meetingNote: "Second Sunday of every month, 3:00 PM – 6:00 PM",
   meetingVenue: "Obu Awka (Apple Junction), Festac, Lagos",
+  bankName: null,
+  accountName: null,
+  accountNumber: null,
+  heroImageUrl: null,
 };
 
 export async function getSiteConfig(): Promise<SiteConfig> {

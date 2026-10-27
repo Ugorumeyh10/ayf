@@ -11,8 +11,8 @@ export default async function AdminSettingsPage() {
       <p className="kicker">Admin</p>
       <h1>Site settings</h1>
       <p>
-        Contact details, social links and meeting information. Vision, mission and aims stay in the public site
-        copy and are not edited here.
+        Contact details, dues account, homepage background, social links and meeting information. Vision, mission
+        and aims stay in the public site copy and are not edited here.
       </p>
       <SettingsForm site={site} />
     </section>

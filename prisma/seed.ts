@@ -18,17 +18,66 @@ import members from "./members-seed.json";
 
 const prisma = new PrismaClient();
 
-async function main() {
-  console.log(`Seeding ${villages.length} villages...`);
+/** Old spreadsheet spellings → official names. Always rename in place (members store villageId). */
+const VILLAGE_RENAMES: [string, string][] = [
+  ["Umubelle", "Umubele"],
+  ["Umuonaga", "Umuanaga"],
+  ["Okpaeri Amikwo", "Okperi Amikwo"],
+  ["Umudiana", "Umudiana Amikwo"],
+  ["Umuogbunu", "Umuogbunu I"],
+];
+
+async function renameVillage(from: string, to: string) {
+  const existing = await prisma.village.findUnique({ where: { name: from } });
+  if (!existing) return;
+  const target = await prisma.village.findUnique({ where: { name: to } });
+  if (!target) {
+    await prisma.village.update({ where: { id: existing.id }, data: { name: to } });
+    return;
+  }
+  if (target.id === existing.id) return;
+  await prisma.member.updateMany({ where: { villageId: existing.id }, data: { villageId: target.id } });
+  await prisma.village.delete({ where: { id: existing.id } });
+}
+
+async function mergeVillage(from: string, into: string) {
+  await renameVillage(from, into);
+}
+
+async function syncVillages() {
+  for (const [from, to] of VILLAGE_RENAMES) {
+    await renameVillage(from, to);
+  }
+  await mergeVillage("Umuzuocha", "Umuzocha");
+
+  const official = villages as { name: string; sortOrder: number; listed: boolean }[];
   const villageIdByName = new Map<string, string>();
-  for (const v of villages as { id: string; name: string }[]) {
+  for (const v of official) {
     const created = await prisma.village.upsert({
       where: { name: v.name },
-      update: {},
-      create: { name: v.name },
+      update: { sortOrder: v.sortOrder, listed: v.listed },
+      create: { name: v.name, sortOrder: v.sortOrder, listed: v.listed },
     });
     villageIdByName.set(v.name, created.id);
   }
+
+  const officialNames = official.map((v) => v.name);
+  await prisma.village.updateMany({
+    where: { name: { notIn: officialNames } },
+    data: { listed: false },
+  });
+
+  const allVillages = await prisma.village.findMany();
+  for (const row of allVillages) {
+    villageIdByName.set(row.name, row.id);
+  }
+
+  return villageIdByName;
+}
+
+async function main() {
+  console.log(`Syncing ${villages.length} official villages...`);
+  const villageIdByName = await syncVillages();
 
   console.log(`Seeding ${members.length} members...`);
   let created = 0;
@@ -102,6 +151,30 @@ async function main() {
     },
   });
   console.log("Ensured SiteConfig singleton.");
+
+  const gallerySeeds = [
+    {
+      title: "AYF Dinner and Award Night",
+      mediaUrl: "/gallery/dinner-award-night.jpg",
+      category: "dinner-award-night",
+    },
+    {
+      title: "2024 Hangout",
+      mediaUrl: "/hero-photo.jpg",
+      category: "hangout-2024",
+    },
+  ];
+  for (const item of gallerySeeds) {
+    const existing = await prisma.galleryItem.findFirst({
+      where: { category: item.category, mediaUrl: item.mediaUrl },
+    });
+    if (!existing) {
+      await prisma.galleryItem.create({
+        data: { ...item, mediaType: "image" },
+      });
+      console.log(`Seeded gallery photo: ${item.title}`);
+    }
+  }
 
   const adminEmail = process.env.ADMIN_BOOTSTRAP_EMAIL;
   const adminPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;

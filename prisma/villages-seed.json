@@ -1,102 +1,35 @@
 [
-  {
-    "id": "v-001",
-    "name": "Amikwo"
-  },
-  {
-    "id": "v-002",
-    "name": "Amudo"
-  },
-  {
-    "id": "v-003",
-    "name": "Ifite"
-  },
-  {
-    "id": "v-004",
-    "name": "Igweogige Amikwo"
-  },
-  {
-    "id": "v-005",
-    "name": "Obunagu Amikwo"
-  },
-  {
-    "id": "v-006",
-    "name": "Okpaeri Amikwo"
-  },
-  {
-    "id": "v-007",
-    "name": "Umuayom"
-  },
-  {
-    "id": "v-008",
-    "name": "Umubelle"
-  },
-  {
-    "id": "v-009",
-    "name": "Umudiana"
-  },
-  {
-    "id": "v-010",
-    "name": "Umudioka"
-  },
-  {
-    "id": "v-011",
-    "name": "Umuenechi"
-  },
-  {
-    "id": "v-012",
-    "name": "Umuike"
-  },
-  {
-    "id": "v-013",
-    "name": "Umujagwo"
-  },
-  {
-    "id": "v-014",
-    "name": "Umukwa"
-  },
-  {
-    "id": "v-015",
-    "name": "Umuneoke"
-  },
-  {
-    "id": "v-016",
-    "name": "Umunnoke"
-  },
-  {
-    "id": "v-017",
-    "name": "Umuogbu"
-  },
-  {
-    "id": "v-018",
-    "name": "Umuogbunu"
-  },
-  {
-    "id": "v-019",
-    "name": "Umuogwali"
-  },
-  {
-    "id": "v-020",
-    "name": "Umuokpu"
-  },
-  {
-    "id": "v-021",
-    "name": "Umuonaga"
-  },
-  {
-    "id": "v-022",
-    "name": "Umuoramma"
-  },
-  {
-    "id": "v-023",
-    "name": "Umuoruka"
-  },
-  {
-    "id": "v-024",
-    "name": "Umuzocha"
-  },
-  {
-    "id": "v-025",
-    "name": "Umuzuocha"
-  }
+  { "name": "Umuayom", "sortOrder": 1, "listed": true },
+  { "name": "Umunnoke", "sortOrder": 2, "listed": true },
+  { "name": "Umuoramma", "sortOrder": 3, "listed": true },
+  { "name": "Umuokpu", "sortOrder": 4, "listed": true },
+  { "name": "Achallaoji Nkwelle", "sortOrder": 5, "listed": true },
+  { "name": "Umunamoke Nkwelle", "sortOrder": 6, "listed": true },
+  { "name": "Agbana Nkwelle", "sortOrder": 7, "listed": true },
+  { "name": "Umudiaba Nkwelle", "sortOrder": 8, "listed": true },
+  { "name": "Amachalla", "sortOrder": 9, "listed": true },
+  { "name": "Amudo", "sortOrder": 10, "listed": true },
+  { "name": "Umuzocha", "sortOrder": 11, "listed": true },
+  { "name": "Enu-Ifite", "sortOrder": 12, "listed": true },
+  { "name": "Ezinato-Ifite", "sortOrder": 13, "listed": true },
+  { "name": "Agbana-Ifite", "sortOrder": 14, "listed": true },
+  { "name": "Umudiana Amikwo", "sortOrder": 15, "listed": true },
+  { "name": "Okperi Amikwo", "sortOrder": 16, "listed": true },
+  { "name": "Igweogige Amikwo", "sortOrder": 17, "listed": true },
+  { "name": "Isiagu Amikwo", "sortOrder": 18, "listed": true },
+  { "name": "Obunagu Amikwo", "sortOrder": 19, "listed": true },
+  { "name": "Omuko", "sortOrder": 20, "listed": true },
+  { "name": "Umueri", "sortOrder": 21, "listed": true },
+  { "name": "Umuogwali", "sortOrder": 22, "listed": true },
+  { "name": "Umuogbunu I", "sortOrder": 23, "listed": true },
+  { "name": "Umuogbunu II", "sortOrder": 24, "listed": true },
+  { "name": "Umudioka", "sortOrder": 25, "listed": true },
+  { "name": "Umukwa", "sortOrder": 26, "listed": true },
+  { "name": "Umuogbu", "sortOrder": 27, "listed": true },
+  { "name": "Umubele", "sortOrder": 28, "listed": true },
+  { "name": "Umuanaga", "sortOrder": 29, "listed": true },
+  { "name": "Umuike", "sortOrder": 30, "listed": true },
+  { "name": "Umujagwo", "sortOrder": 31, "listed": true },
+  { "name": "Umuenechi", "sortOrder": 32, "listed": true },
+  { "name": "Umuoruka", "sortOrder": 33, "listed": true }
 ]

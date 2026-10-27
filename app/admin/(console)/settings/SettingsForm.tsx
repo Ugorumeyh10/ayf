@@ -3,6 +3,7 @@
 import { useFormState, useFormStatus } from "react-dom";
 import type { SiteConfig } from "@prisma/client";
 import { updateSiteConfig } from "../../../actions/admin-content";
+import ImagePreviewInput from "../../../../components/ImagePreviewInput";
 
 const initial = { ok: false, message: "" };
 
@@ -67,6 +68,31 @@ export default function SettingsForm({ site }: { site: SiteConfig }) {
         <label htmlFor="instagramUrl">Instagram URL (optional)</label>
         <input id="instagramUrl" name="instagramUrl" type="url" defaultValue={site.instagramUrl ?? ""} />
       </div>
+      <div className="field">
+        <label htmlFor="bankName">Dues bank (optional)</label>
+        <input id="bankName" name="bankName" defaultValue={site.bankName ?? ""} />
+      </div>
+      <div className="field">
+        <label htmlFor="accountName">Dues account name (optional)</label>
+        <input id="accountName" name="accountName" defaultValue={site.accountName ?? ""} />
+      </div>
+      <div className="field">
+        <label htmlFor="accountNumber">Dues account number (optional)</label>
+        <input id="accountNumber" name="accountNumber" inputMode="numeric" defaultValue={site.accountNumber ?? ""} />
+        <span className="hint">Shown on Get Involved and in the members’ area with a copy button.</span>
+      </div>
+      <ImagePreviewInput
+        name="heroImage"
+        label="Homepage background"
+        currentUrl={site.heroImageUrl}
+        hint="JPEG, PNG or WebP, under 4 MB. Leave empty to keep the current picture."
+      />
+      {site.heroImageUrl && (
+        <label className="checkbox-row">
+          <input type="checkbox" name="clearHeroImage" />
+          Remove the current background (uses a clean dark wash and the AYF mark)
+        </label>
+      )}
       <Submit />
       {state?.message && <div className={`msg ${state.ok ? "" : "err"}`}>{state.message}</div>}
     </form>

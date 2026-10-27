@@ -1,5 +1,9 @@
 import Link from "next/link";
 import PageHeader from "../../components/PageHeader";
+import DuesAccountCard from "../../components/DuesAccountCard";
+import { getSiteConfig } from "../../lib/site-config";
+
+export const dynamic = "force-dynamic";
 
 const options = [
   {
@@ -24,18 +28,6 @@ const options = [
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Pay dues",
-    desc: "For registered members to make approved membership payments.",
-    href: "/members/login",
-    label: "Open members’ area",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <line x1="2" y1="10" x2="22" y2="10" />
       </svg>
     ),
   },
@@ -77,7 +69,9 @@ const options = [
   },
 ];
 
-export default function GetInvolvedPage() {
+export default async function GetInvolvedPage() {
+  const site = await getSiteConfig();
+
   return (
     <section className="block wrap">
       <PageHeader
@@ -86,7 +80,43 @@ export default function GetInvolvedPage() {
         lede="Every card is a door in — membership, volunteering, partnership or sponsorship. Pick the one that fits."
       />
       <div className="card-grid stagger">
-        {options.map((o) => (
+        {options.slice(0, 2).map((o) => (
+          <Link key={o.title} href={o.href} className="card">
+            <div className="icon-badge">{o.icon}</div>
+            <h3>{o.title}</h3>
+            <p>{o.desc}</p>
+            <span className="btn outline small">
+              {o.label}
+              <span className="chev" aria-hidden>
+                →
+              </span>
+            </span>
+          </Link>
+        ))}
+
+        <div className="card">
+          <div className="icon-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+          </div>
+          <h3>Pay dues</h3>
+          <p>For registered members to make approved membership payments.</p>
+          <DuesAccountCard
+            bankName={site.bankName}
+            accountName={site.accountName}
+            accountNumber={site.accountNumber}
+          />
+          <Link href="/members/login" className="btn outline small" style={{ marginTop: 12 }}>
+            Open members’ area
+            <span className="chev" aria-hidden>
+              →
+            </span>
+          </Link>
+        </div>
+
+        {options.slice(2).map((o) => (
           <Link key={o.title} href={o.href} className="card">
             <div className="icon-badge">{o.icon}</div>
             <h3>{o.title}</h3>

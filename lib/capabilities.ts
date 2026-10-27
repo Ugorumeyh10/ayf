@@ -53,6 +53,8 @@ export const ADMIN_NAV: { href: string; label: string; cap?: Capability }[] = [
   { href: "/admin/dashboard", label: "Dashboard" },
   { href: "/admin/members", label: "Members", cap: "members.read" },
   { href: "/admin/events", label: "Events", cap: "events.write" },
+  { href: "/admin/gallery", label: "Gallery", cap: "content.publish" },
+  { href: "/admin/team", label: "Executives", cap: "content.publish" },
   { href: "/admin/enquiries", label: "Enquiries", cap: "enquiries.handle" },
   { href: "/admin/settings", label: "Site settings", cap: "settings.write" },
 ];

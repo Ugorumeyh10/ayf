@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signIn } from "../../../lib/auth";
+import PasswordField from "../../../components/PasswordField";
 
 export default async function AdminLoginPage() {
   const session = await auth();
@@ -23,10 +24,7 @@ export default async function AdminLoginPage() {
           <label htmlFor="email">Email</label>
           <input id="email" name="email" type="email" autoComplete="username" required />
         </div>
-        <div className="field">
-          <label htmlFor="password">Password</label>
-          <input id="password" name="password" type="password" autoComplete="current-password" required />
-        </div>
+        <PasswordField />
         <button type="submit" className="btn primary" style={{ width: "100%", justifyContent: "center" }}>
           Sign in
           <span className="chev" aria-hidden>

@@ -2,6 +2,17 @@ import { prisma } from "../../lib/prisma";
 import PageHeader from "../../components/PageHeader";
 import EmptyState from "../../components/EmptyState";
 
+export const dynamic = "force-dynamic";
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
 export default async function TeamPage() {
   const executives = await prisma.executive.findMany({
     where: { isActive: true },
@@ -26,7 +37,15 @@ export default async function TeamPage() {
       ) : (
         <div className="card-grid stagger">
           {executives.map((e) => (
-            <div key={e.id} className="card">
+            <div key={e.id} className="card exec-card">
+              {e.photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={e.photoUrl} alt={e.fullName} className="exec-photo" />
+              ) : (
+                <div className="exec-fallback" aria-hidden>
+                  {initials(e.fullName)}
+                </div>
+              )}
               <h3>{e.fullName}</h3>
               <p style={{ color: "var(--red-deep)", fontWeight: 700 }}>{e.position}</p>
               {e.bio && <p>{e.bio}</p>}
