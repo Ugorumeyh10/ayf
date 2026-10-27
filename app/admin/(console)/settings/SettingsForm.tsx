@@ -84,13 +84,13 @@ export default function SettingsForm({ site }: { site: SiteConfig }) {
       <ImagePreviewInput
         name="heroImage"
         label="Homepage background"
-        currentUrl={site.heroImageUrl}
+        currentUrl={site.heroImageUrl || "/hero-photo.jpg"}
         hint="JPEG, PNG or WebP, under 4 MB. Leave empty to keep the current picture."
       />
       {site.heroImageUrl && (
         <label className="checkbox-row">
           <input type="checkbox" name="clearHeroImage" />
-          Remove the current background (uses a clean dark wash and the AYF mark)
+          Revert to the original chapter photo
         </label>
       )}
       <Submit />

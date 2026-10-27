@@ -21,19 +21,15 @@ export default async function HomePage() {
   ]);
 
   const event = featuredEvent ?? upcomingEvent;
-  const heroUrl = site.heroImageUrl;
-  const heroBackground = heroUrl
-    ? "linear-gradient(100deg, rgba(20,17,15,.52) 0%, rgba(20,17,15,.20) 40%, rgba(20,17,15,0) 65%), " +
-      "linear-gradient(to top, rgba(20,17,15,.55) 0%, rgba(20,17,15,0) 35%), " +
-      `url(${heroUrl})`
-    : "linear-gradient(160deg, #1a1612 0%, #14110f 55%, #2a100e 100%), url(/logo.jpg)";
+  const heroUrl = site.heroImageUrl || "/hero-photo.jpg";
+  const heroBackground =
+    "linear-gradient(100deg, rgba(20,17,15,.52) 0%, rgba(20,17,15,.20) 40%, rgba(20,17,15,0) 65%), " +
+    "linear-gradient(to top, rgba(20,17,15,.55) 0%, rgba(20,17,15,0) 35%), " +
+    `url(${heroUrl})`;
 
   return (
     <>
-      <div
-        className={`hero${heroUrl ? "" : " hero-plain"}`}
-        style={{ backgroundImage: heroBackground }}
-      >
+      <div className="hero" style={{ backgroundImage: heroBackground }}>
         <div className="hero-inner wrap">
           <p className="eyebrow">Awka Youth Forum &middot; Lagos Chapter</p>
           <h1>Building the future of Awka, together.</h1>
