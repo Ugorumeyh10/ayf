@@ -32,10 +32,10 @@ export default async function AdminConsoleLayout({ children }: { children: React
           </div>
         </div>
         <div className="wrap">
-          <AdminNav links={links} />
+          <AdminNav links={links.map(({ href, label }) => ({ href, label }))} />
         </div>
       </header>
-      {children}
+      <div className="admin-body">{children}</div>
     </div>
   );
 }

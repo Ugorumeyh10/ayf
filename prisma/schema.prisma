@@ -126,12 +126,27 @@ model DuesPayment {
   @@unique([memberId, periodMonth, periodYear])
 }
 
+enum MeetingMinutesStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model Meeting {
-  id                String             @id @default(cuid())
+  id                String                @id @default(cuid())
   title             String
   date              DateTime
   venue             String?
+  agenda            String?
+  minutesBody       String?
+  decisions         String?
+  attendeesNote     String?
+  status            MeetingMinutesStatus  @default(DRAFT)
+  publishedAt       DateTime?
+  createdByAdminId  String?
+  updatedAt         DateTime              @updatedAt
   attendanceRecords AttendanceRecord[]
+
+  @@index([status, date])
 }
 
 model AttendanceRecord {

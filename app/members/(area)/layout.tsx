@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireMemberSession } from "../../../lib/guards";
 import { signOutMember } from "../../actions/session";
+import MembersNav from "../../../components/MembersNav";
 
 export default async function MembersAreaLayout({ children }: { children: React.ReactNode }) {
   const member = await requireMemberSession();
@@ -25,6 +26,9 @@ export default async function MembersAreaLayout({ children }: { children: React.
               </button>
             </form>
           </div>
+        </div>
+        <div className="wrap">
+          <MembersNav />
         </div>
       </header>
       {children}

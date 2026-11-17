@@ -8,20 +8,26 @@ export default async function AdminDashboard() {
   const canMembers = hasCapability(admin.role, "members.read");
   const canEnquiries = hasCapability(admin.role, "enquiries.handle");
   const canEvents = hasCapability(admin.role, "events.write");
+  const canMinutes = hasCapability(admin.role, "attendance.write");
 
-  const [pendingCount, memberCount, unhandledContact, unhandledPartner, eventCount] = await Promise.all([
-    prisma.member.count({ where: { status: "PENDING" } }),
-    prisma.member.count({ where: { status: "ACTIVE" } }),
-    prisma.contactEnquiry.count({ where: { handledAt: null } }),
-    prisma.partnershipEnquiry.count({ where: { handledAt: null } }),
-    prisma.event.count(),
-  ]);
+  const [pendingCount, memberCount, unhandledContact, unhandledPartner, eventCount, draftMinutes, publishedMinutes] =
+    await Promise.all([
+      prisma.member.count({ where: { status: "PENDING" } }),
+      prisma.member.count({ where: { status: "ACTIVE" } }),
+      prisma.contactEnquiry.count({ where: { handledAt: null } }),
+      prisma.partnershipEnquiry.count({ where: { handledAt: null } }),
+      prisma.event.count(),
+      prisma.meeting.count({ where: { status: "DRAFT" } }),
+      prisma.meeting.count({ where: { status: "PUBLISHED" } }),
+    ]);
 
   return (
     <section className="block wrap">
       <p className="kicker">Admin</p>
       <h1>Dashboard</h1>
-      <p style={{ marginTop: 0 }}>Signed in as {admin.role.replaceAll("_", " ")}. You only see tools your office can use.</p>
+      <p style={{ marginTop: 0 }}>
+        Signed in as {admin.role.replaceAll("_", " ")}. You only see tools your office can use.
+      </p>
       <div className="card-grid stagger">
         {canMembers && <StatCard label="Pending applications" value={pendingCount} href="/admin/members" />}
         {canMembers && <StatCard label="Active members" value={memberCount} href="/admin/members" accent />}
@@ -33,6 +39,10 @@ export default async function AdminDashboard() {
           />
         )}
         {canEvents && <StatCard label="Published events" value={eventCount} href="/admin/events" />}
+        {canMinutes && (
+          <StatCard label="Published minutes" value={publishedMinutes} href="/admin/minutes" />
+        )}
+        {canMinutes && <StatCard label="Draft minutes" value={draftMinutes} href="/admin/minutes" />}
       </div>
     </section>
   );

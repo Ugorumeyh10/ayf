@@ -31,11 +31,10 @@ export default async function HomePage() {
     <>
       <div className="hero" style={{ backgroundImage: heroBackground }}>
         <div className="hero-inner wrap">
-          <p className="eyebrow">Awka Youth Forum &middot; Lagos Chapter</p>
+          <p className="eyebrow">Awka Youth Forum</p>
           <h1>Building the future of Awka, together.</h1>
           <p className="lede">
-            A non-religious, non-political, socio-cultural and community development association for Awka
-            youths resident in Lagos State.
+            Lagos Chapter — a socio-cultural home for Awka youths: community, growth, and culture.
           </p>
           <div className="cta-row">
             <Link href="/join" className="btn primary">
